@@ -1,47 +1,40 @@
-// Выбор устройства и переключение режимов. Режим живёт в адресе: #mac / #ios.
-(function () {
-  var chooser = document.getElementById('chooser');
-  var macEl = document.getElementById('mac');
-  var iosEl = document.getElementById('ios');
-  var isPhone = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 600;
-  var mounted = {};
+// Переключение между экраном выбора, Маком и айфоном. Режим живёт в адресе: #mac / #ios.
+(() => {
+  const chooser = document.getElementById('chooser');
+  const macEl = document.getElementById('mac');
+  const iosEl = document.getElementById('ios');
 
-  chooser.querySelectorAll('.pick').forEach(function (b) {
-    if (b.dataset.mode === (isPhone ? 'ios' : 'mac')) b.classList.add('suggested');
-    b.addEventListener('click', function () { go(b.dataset.mode); });
+  const isPhone = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 600;
+  const suggested = isPhone ? 'ios' : 'mac';
+
+  chooser.querySelectorAll('.device-pick').forEach(btn => {
+    if (btn.dataset.mode === suggested) {
+      btn.classList.add('is-suggested');
+      btn.querySelector('.pick-hint').hidden = false;
+    }
+    btn.addEventListener('click', () => go(btn.dataset.mode));
   });
+
+  let mounted = { mac: false, ios: false };
 
   function show(mode) {
     chooser.hidden = mode !== 'choose';
     macEl.hidden = mode !== 'mac';
     iosEl.hidden = mode !== 'ios';
-    document.body.dataset.mode = mode;
     if (mode === 'mac' && !mounted.mac) { Mac.mount(macEl); mounted.mac = true; }
-    if (mode === 'ios' && !mounted.ios) { IOS.mount(iosEl, !isPhone && window.innerWidth > 600); mounted.ios = true; }
-    if (mode === 'mac') Mac.fit();
-    tick();
+    if (mode === 'ios' && !mounted.ios) { IOS.mount(iosEl, { framed: !isPhone }); mounted.ios = true; }
+    if (mode === 'mac') Mac.onShow();
+    if (mode === 'ios') IOS.onShow();
   }
-  function current() { return location.hash === '#mac' ? 'mac' : location.hash === '#ios' ? 'ios' : 'choose'; }
+
   function go(mode) {
-    var hash = mode === 'choose' ? '' : '#' + mode;
+    const hash = mode === 'choose' ? '' : '#' + mode;
     if (location.hash !== hash) history.pushState(null, '', hash || location.pathname);
     show(mode);
   }
 
-  // Часы и даты для обоих режимов
-  function tick() {
-    var d = new Date();
-    var t = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-    document.querySelectorAll('[data-clock]').forEach(function (n) { n.textContent = t; });
-    var long = d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
-    long = long.charAt(0).toUpperCase() + long.slice(1);
-    document.querySelectorAll('.lock-date, .login-date').forEach(function (n) { n.textContent = long; });
-    var short = d.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '');
-    document.querySelectorAll('.mb-date').forEach(function (n) { n.textContent = short; });
-  }
-  setInterval(tick, 10000);
-
-  window.App = { go: go };
-  window.addEventListener('popstate', function () { show(current()); });
+  window.App = { go };
+  addEventListener('popstate', () => show(current()));
+  function current() { return location.hash === '#mac' ? 'mac' : location.hash === '#ios' ? 'ios' : 'choose'; }
   show(current());
 })();

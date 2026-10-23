@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f6a93"/><stop offset=".28" stop-color="#9a8fae"/><stop offset=".5" stop-color="#d9b2ab"/><stop offset=".62" stop-color="#f1c9a6"/><stop offset="1" stop-color="#f3c49c"/></linearGradient>
+<radialGradient id="sun" cx=".62" cy=".56" r=".42"><stop offset="0" stop-color="#fff4dc" stop-opacity=".95"/><stop offset=".35" stop-color="#ffd9a8" stop-opacity=".45"/><stop offset="1" stop-color="#ffd9a8" stop-opacity="0"/></radialGradient>
+<linearGradient id="g0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eab48f"/><stop offset="1" stop-color="#e09f80"/></linearGradient><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d58b74"/><stop offset="1" stop-color="#c2766b"/></linearGradient><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a4677002"/><stop offset="1" stop-color="#8f5b69"/></linearGradient><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a46770"/><stop offset="1" stop-color="#7f5068"/></linearGradient><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d4462"/><stop offset="1" stop-color="#3f3350"/></linearGradient>
+<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .07 0"/></filter>
+</defs>
+<rect width="1600" height="1000" fill="url(#sky)"/>
+<rect width="1600" height="1000" fill="url(#sun)"/>
+<path d="M0 560C220 520 380 600 600 575S1000 500 1240 540 1500 600 1600 585V1000H0Z" fill="url(#g0)"/><path d="M0 650C260 610 470 700 760 660S1180 600 1600 650V1000H0Z" fill="url(#g1)"/><path d="M0 760C300 700 560 790 880 750S1350 700 1600 740V1000H0Z" fill="url(#g2)"/><path d="M0 760C300 700 560 790 880 750S1350 700 1600 740V1000H0Z" fill="url(#g3)"/><path d="M0 870C340 820 620 900 980 860S1420 830 1600 860V1000H0Z" fill="url(#g4)"/>
+<rect width="1600" height="1000" filter="url(#grain)"/>
+</svg>

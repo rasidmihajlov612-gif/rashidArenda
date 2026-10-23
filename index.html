@@ -2,47 +2,51 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f2f2f7">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#f4f1ec">
 <title>Рашид Михайлов — сдать квартиру в Москве</title>
 <meta name="description" content="Рашид Михайлов, агент по аренде в агентстве Андрея Медведева. Сдать квартиру в Москве и области, собственник комиссию не платит.">
 <link rel="icon" href="img/agency.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/base.css?v=8">
-<link rel="stylesheet" href="css/apps.css?v=8">
-<link rel="stylesheet" href="css/ios.css?v=8">
-<link rel="stylesheet" href="css/mac.css?v=8">
-<link rel="stylesheet" href="css/games.css?v=8">
+<link rel="stylesheet" href="css/base.css?v=9">
+<link rel="stylesheet" href="css/mac.css?v=9">
+<link rel="stylesheet" href="css/ios.css?v=9">
+<link rel="stylesheet" href="css/extra.css?v=9">
+<link rel="stylesheet" href="css/games.css?v=9">
 </head>
 <body>
 
 <main id="chooser" class="chooser" hidden>
-  <p class="ch-name">Рашид Михайлов</p>
-  <h1>Откуда смотрите?</h1>
-  <div class="picks">
-    <button class="pick" data-mode="ios">
-      <span class="pick-art art-phone" aria-hidden="true"><span></span></span>
-      <span class="pick-label">С телефона</span>
-    </button>
-    <button class="pick" data-mode="mac">
-      <span class="pick-art art-laptop" aria-hidden="true"><span></span><i></i></span>
+  <div class="chooser-head">
+    <p class="chooser-name">Рашид Михайлов · аренда квартир</p>
+    <p class="chooser-lead">Откуда смотрите?</p>
+  </div>
+  <div class="chooser-options">
+    <button class="device-pick" data-mode="mac">
+      <span class="pick-art pick-laptop" aria-hidden="true"><span class="lt-screen"></span><span class="lt-base"></span></span>
       <span class="pick-label">С компьютера</span>
+      <span class="pick-hint" hidden>похоже, это ваш вариант</span>
+    </button>
+    <button class="device-pick" data-mode="ios">
+      <span class="pick-art pick-phone" aria-hidden="true"><span class="ph-screen"></span></span>
+      <span class="pick-label">С телефона</span>
+      <span class="pick-hint" hidden>похоже, это ваш вариант</span>
     </button>
   </div>
-  <p class="ch-foot">Внутри — мой рабочий телефон или ноутбук. Можно смотреть всё.</p>
+  <p class="chooser-foot">Внутри — мой рабочий ноутбук или телефон: объекты, кейсы, отзывы собственников. Можно смотреть всё.</p>
 </main>
 
-<div id="ios" class="ios-root" hidden></div>
-<div id="mac" class="mac-root" hidden></div>
+<div id="mac" class="mac-viewport" hidden></div>
+<div id="ios" class="ios-viewport" hidden></div>
 
-<script src="content.js?v=8"></script>
-<script src="js/icons.js?v=8"></script>
-<script src="js/core.js?v=8"></script>
-<script src="js/games.js?v=8"></script>
-<script src="js/ios.js?v=8"></script>
-<script src="js/mac.js?v=8"></script>
-<script src="js/app.js?v=8"></script>
+<script src="content.js?v=9"></script>
+<script src="js/icons.js?v=9"></script>
+<script src="js/core.js?v=9"></script>
+<script src="js/games.js?v=9"></script>
+<script src="js/mac.js?v=9"></script>
+<script src="js/ios.js?v=9"></script>
+<script src="js/app.js?v=9"></script>
 </body>
 </html>
