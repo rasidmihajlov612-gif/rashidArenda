@@ -197,7 +197,7 @@
         var t = h('span', 'object-text');
         if (o.price) t.appendChild(h('b', 'object-price', o.price));
         t.appendChild(h('span', 'object-title', o.title));
-        if (o.where) t.appendChild(h('span', 'object-where', o.where));
+        if (o.metro || o.where) t.appendChild(h('span', 'object-where', o.metro || o.where));
         b.appendChild(t);
         b.addEventListener('click', function () { nav.push(viewObject(o, nav)); });
         list.appendChild(b);
@@ -207,16 +207,21 @@
     } else {
       list.appendChild(h('p', 'empty', 'Сейчас всё сдано. Спросите меня, что появится на этой неделе.'));
     }
-    return { node: list, title: 'Объекты', small: 'Объекты', tint: '#ff9500' };
+    var wrap = h('div');
+    if (S.objects.length) wrap.appendChild(h('p', 'list-note', 'Сдаются сейчас. Напишите, если какая-то понравилась, или расскажите, что ищете.'));
+    wrap.appendChild(list);
+    return { node: wrap, title: 'Объекты', small: 'Объекты', tint: '#ff9500' };
   }
   function viewObject(o, nav) {
     var w = h('div', 'detail');
     if (o.photos && o.photos.length) w.appendChild(shots(o.photos, o.title, nav));
     if (o.price) w.appendChild(h('p', 'object-price big', o.price));
+    if (o.metro) w.appendChild(h('p', 'object-metro', o.metro));
     if (o.where) w.appendChild(h('p', 'object-where', o.where));
+    if (o.facts && o.facts.length) w.appendChild(chips(o.facts));
     if (o.text) String(o.text).split(/\n+/).forEach(function (p) { w.appendChild(h('p', 'story', nb(p))); });
     var box = h('div', 'btn-col');
-    if (o.link) box.appendChild(link(h('a', 'btn', 'Объявление целиком'), o.link));
+    if (o.link) box.appendChild(link(h('a', 'btn', 'Объявление на Циане'), o.link));
     contactButtons(box);
     w.appendChild(box);
     return { node: w, title: o.title, small: o.title, tint: '#ff9500' };
@@ -374,7 +379,9 @@
     w.appendChild(group('Об этом владельце', [
       { label: 'Имя', value: S.name },
       { label: 'Возраст', value: '22 года' },
+      { label: 'Сдано объектов', value: 'больше 122' },
       { label: 'Работа', value: 'аренда квартир' },
+      { label: 'Ещё', value: 'продажа и покупка' },
       { label: 'Агентство', value: 'А. Медведева' },
       { label: 'Где', value: 'Москва и область' },
       { label: 'Комиссия для собственника', value: '0 ₽' }

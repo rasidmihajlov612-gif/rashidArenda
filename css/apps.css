@@ -76,6 +76,10 @@ a.cell:active, button.cell:active { background: #e5e5ea; }
 .object-price.big { font-size: 28px; margin: 4px 0 2px; }
 .object-title { font-size: 15px; }
 .object-where { font-size: 14px; color: var(--label-2); }
+.object-metro { font-size: 16px; margin: 0 0 2px; }
+.detail .object-where { margin-bottom: 12px; }
+.detail .chips { margin-bottom: 14px; }
+.list-note { color: var(--label-2); font-size: 15px; margin: -6px 0 14px; }
 .slot-object { min-height: 126px; }
 .empty { color: var(--label-2); }
 

@@ -33,7 +33,9 @@ window.SITE = {
   about: [
     "Мне 22 года. В продажах всю жизнь, сколько себя помню.",
     "В профессию пришёл, потому что аренда — про решение проблем и поиск нестандартных решений. А я это люблю.",
-    "В жизни занимаюсь юмором."
+    "В жизни занимаюсь юмором.",
+    "Сдал уже больше 122 объектов. Меня рекомендуют, и ко мне возвращаются.",
+    "Продажами и покупками тоже занимаемся. Если нужно — буду рад помочь."
   ],
 
   // Кейсы — квартиры, которые уже сдал. Формат одного:
@@ -42,10 +44,39 @@ window.SITE = {
   //   photos: ["img/cases/sokol-1.jpg", "img/cases/sokol-2.jpg"] }
   cases: [],
 
-  // Объекты — что сдаётся сейчас. Формат одного:
-  // { title: "1-к, 38 м²", where: "м. Сокол, 7 мин пешком", price: "55 000 ₽ в месяц",
-  //   text: "Пара слов о квартире", photos: ["img/objects/1.jpg"], link: "https://www.cian.ru/rent/flat/…" }
-  objects: [],
+  // Объекты с Циана (данные и фото из объявлений на 23.10.2026)
+  objects: [
+    { title: "2-комн., 40 м²", price: "65 000 ₽ в месяц", metro: "м. Солнцево · 5 мин",
+      where: "Москва, Солнцево, Родниковая ул., 9Ак3",
+      facts: ["40 м²", "кухня 10 м²", "5 этаж из 18", "дом 2018 года"],
+      text: "Просторная и невероятно светлая квартира. Интерьер в мягких светлых тонах, большие окна, современная бытовая техника, удобная кухня и вместительные системы хранения.",
+      photos: ["img/objects/rodnikovaya/1.jpg", "img/objects/rodnikovaya/2.jpg", "img/objects/rodnikovaya/3.jpg", "img/objects/rodnikovaya/4.jpg", "img/objects/rodnikovaya/5.jpg", "img/objects/rodnikovaya/6.jpg"], link: "https://www.cian.ru/rent/flat/335052023/" },
+    { title: "2-комн., 40 м²", price: "85 000 ₽ в месяц", metro: "м. Прокшино · 700 м",
+      where: "Москва, НАО, ул. Лобановский Лес, 9, ЖК Прокшино",
+      facts: ["40 м²", "кухня-гостиная", "6 этаж из 20", "дом 2024 года"],
+      text: "Дизайнерский ремонт из качественных материалов. Закрытая территория, набережная, в доме подземный паркинг. Есть кондиционер, посудомоечная машина, духовой шкаф.",
+      photos: ["img/objects/lobanovsky/1.jpg", "img/objects/lobanovsky/2.jpg", "img/objects/lobanovsky/3.jpg", "img/objects/lobanovsky/4.jpg", "img/objects/lobanovsky/5.jpg", "img/objects/lobanovsky/6.jpg"], link: "https://www.cian.ru/rent/flat/334622476/" },
+    { title: "1-комн., 31 м²", price: "60 000 ₽ в месяц", metro: "м. Прокшино · 8 мин пешком",
+      where: "Москва, НАО, Прокшинский просп., 11",
+      facts: ["31 м²", "11 этаж из 16", "потолки 2,84 м", "дом 2022 года"],
+      text: "Евроремонт в новом монолитном доме. В комнате и на кухне есть вся мебель и техника, можно сразу заехать. Два лифта, наземная парковка.",
+      photos: ["img/objects/prokshinsky/1.jpg", "img/objects/prokshinsky/2.jpg", "img/objects/prokshinsky/3.jpg", "img/objects/prokshinsky/4.jpg", "img/objects/prokshinsky/5.jpg", "img/objects/prokshinsky/6.jpg"], link: "https://www.cian.ru/rent/flat/334662062/" },
+    { title: "Студия, 25 м²", price: "60 000 ₽ в месяц", metro: "м. Ботанический сад · 11 мин",
+      where: "Москва, Свиблово, проезд Серебрякова, 11к2, ЖК Аффи Тауэр",
+      facts: ["25 м²", "4 этаж из 53", "дом 2024 года"],
+      text: "Небольшая, светлая и уютная студия. Продуманная планировка, аккуратный ремонт — заезжай и живи. Подойдёт одному человеку или паре.",
+      photos: ["img/objects/serebryakova/1.jpg", "img/objects/serebryakova/2.jpg", "img/objects/serebryakova/3.jpg", "img/objects/serebryakova/4.jpg", "img/objects/serebryakova/5.jpg"], link: "https://www.cian.ru/rent/flat/334673318/" },
+    { title: "3-комн., 56 м²", price: "50 000 ₽ в месяц", metro: "м. Зябликово · 21 мин на машине",
+      where: "Ленинский г. о., д. Калиновка, ул. Лесных Озер, 9к2",
+      facts: ["56 м²", "кухня 15 м²", "13 этаж из 16"],
+      text: "Окна во двор, поэтому в квартире тихо. Евроремонт, на кухне вся мебель и техника, есть кондиционер. Пассажирский и грузовой лифты, интернет подключён.",
+      photos: ["img/objects/lesnyh-ozer/1.jpg", "img/objects/lesnyh-ozer/2.jpg", "img/objects/lesnyh-ozer/3.jpg", "img/objects/lesnyh-ozer/4.jpg", "img/objects/lesnyh-ozer/5.jpg", "img/objects/lesnyh-ozer/6.jpg"], link: "https://vidnoye.cian.ru/rent/flat/334842699/" },
+    { title: "2-комн., 35 м²", price: "43 000 ₽ в месяц", metro: "МЦД Павшино · 16 мин",
+      where: "Красногорск, пос. Ильинское-Усово, ул. Архангельская, 15",
+      facts: ["35 м²", "кухня 10 м²", "6 этаж из 6", "дом 2024 года"],
+      text: "Чистая, светлая квартира с современным ремонтом. Большой телевизор, удобный диван, полностью оборудованная кухня. Быстрый показ, заселение в день показа.",
+      photos: ["img/objects/arhangelskaya/1.jpg", "img/objects/arhangelskaya/2.jpg", "img/objects/arhangelskaya/3.jpg", "img/objects/arhangelskaya/4.jpg", "img/objects/arhangelskaya/5.jpg", "img/objects/arhangelskaya/6.jpg"], link: "https://www.cian.ru/rent/flat/335032943/" }
+  ],
 
   // Отзывы = чаты в «Сообщениях».
   // Скриншот переписки: { from: "Ольга, Химки", img: "img/reviews/1.jpg" }
