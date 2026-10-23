@@ -87,7 +87,6 @@
     tetris:   { label: 'Тетрис',      icon: 'tetris',    view: function () { return gameView('tetris'); }, w: 400, h: 640 },
     snake:    { label: 'Змейка',      icon: 'snake',     view: function () { return gameView('snake'); },  w: 420, h: 620 },
     g2048:    { label: '2048',        icon: 'g2048',     view: function () { return gameView('g2048'); },  w: 420, h: 600 },
-    agency:   { label: 'Агентство',   icon: 'safari',    href: S.agencyUrl },
     telegram: { label: 'Telegram',    icon: 'telegram',  href: C.tg },
     whatsapp: { label: 'WhatsApp',    icon: 'whatsapp',  href: C.wa }
   };

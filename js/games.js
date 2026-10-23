@@ -10,8 +10,10 @@
     if (active.key(e.key)) e.preventDefault();
   });
 
-  // Каркас: счёт, поле, кнопки, экран «игра окончена»
-  function shell(id, title, controls) {
+  var touch = matchMedia('(pointer: coarse)').matches;
+
+  // Каркас: счёт, поле, подсказка, экран «игра окончена». Управление — пальцем по полю или клавишами.
+  function shell(id, touchHint, keyHint) {
     var el = h('div', 'game game-' + id);
     var head = h('div', 'game-head');
     var sc = h('div', 'game-score'); sc.appendChild(h('small', null, 'счёт')); var scv = h('b', null, '0'); sc.appendChild(scv);
@@ -23,21 +25,7 @@
     var over = h('div', 'game-over');
     over.hidden = true;
     field.appendChild(over);
-    var pad = h('div', 'game-pad');
-    controls.forEach(function (c) {
-      var b = h('button', 'pad-btn' + (c[2] ? ' ' + c[2] : ''), c[0]);
-      b.setAttribute('aria-label', c[3] || c[0]);
-      var rep = null;
-      function fire(e) { e.preventDefault(); g.key(c[1]); }
-      b.addEventListener('pointerdown', function (e) {
-        fire(e);
-        if (c[4]) rep = setTimeout(function loop() { g.key(c[1]); rep = setTimeout(loop, 70); }, 220);
-      });
-      ['pointerup', 'pointerleave', 'pointercancel'].forEach(function (ev) { b.addEventListener(ev, function () { clearTimeout(rep); }); });
-      pad.appendChild(b);
-    });
-    el.appendChild(pad);
-    el.appendChild(h('p', 'game-hint', title));
+    el.appendChild(h('p', 'game-hint', touch ? touchHint : keyHint));
 
     var g = {
       el: el, field: field, key: function () { return false; },
@@ -60,17 +48,23 @@
     return g;
   }
 
-  // Свайпы по полю
+  // Свайпы по полю: направление срабатывает, как только палец сдвинулся, тап — если не сдвинулся
   function swipes(node, cb) {
-    var x0, y0;
-    node.addEventListener('pointerdown', function (e) { x0 = e.clientX; y0 = e.clientY; });
-    node.addEventListener('pointerup', function (e) {
-      if (x0 == null) return;
-      var dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return cb('tap');
+    var x0 = null, y0, fired;
+    node.style.touchAction = 'none';
+    node.addEventListener('pointerdown', function (e) {
+      x0 = e.clientX; y0 = e.clientY; fired = false;
+      try { node.setPointerCapture(e.pointerId); } catch (_) {}
+    });
+    node.addEventListener('pointermove', function (e) {
+      if (x0 === null || fired) return;
+      var dx = e.clientX - x0, dy = e.clientY - y0;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 22) return;
+      fired = true;
       cb(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
     });
-    node.style.touchAction = 'none';
+    node.addEventListener('pointerup', function () { if (x0 !== null && !fired) cb('tap'); x0 = null; });
+    node.addEventListener('pointercancel', function () { x0 = null; });
   }
 
   function canvas(w, h2, cell) {
@@ -89,10 +83,8 @@
   // ---------- Тетрис ----------
   function tetris() {
     var W = 10, H = 20, CELL = 24;
-    var g = shell('tetris', 'Стрелки — двигать, ↑ — повернуть, пробел — уронить', [
-      ['←', 'ArrowLeft', '', 'Влево', true], ['↻', 'ArrowUp', '', 'Повернуть'], ['→', 'ArrowRight', '', 'Вправо', true],
-      ['↓', 'ArrowDown', '', 'Вниз', true], ['⤓', ' ', 'wide', 'Уронить']
-    ]);
+    var g = shell('tetris', 'Тап — повернуть. Веди пальцем — двигать. Смахни вниз — уронить',
+      'Стрелки — двигать, ↑ — повернуть, пробел — уронить');
     var cv = canvas(W, H, CELL); g.field.insertBefore(cv.c, g.field.firstChild);
     var ctx = cv.ctx;
     var SH = {
@@ -166,7 +158,31 @@
       else return ['ArrowLeft', 'ArrowRight'].indexOf(k) >= 0;
       return true;
     };
-    swipes(cv.c, function (d) { g.key({ left: 'ArrowLeft', right: 'ArrowRight', down: ' ', up: 'ArrowUp', tap: 'ArrowUp' }[d]); });
+    // Пальцем: фигура едет за пальцем по клеткам, тап — поворот, резкий взмах вниз — уронить
+    (function (c) {
+      var sx = null, sy, lx, ly, t0, moved;
+      c.style.touchAction = 'none';
+      c.addEventListener('pointerdown', function (e) {
+        sx = lx = e.clientX; sy = ly = e.clientY; t0 = Date.now(); moved = false;
+        try { c.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+      c.addEventListener('pointermove', function (e) {
+        if (sx === null || dead) return;
+        var cell = c.getBoundingClientRect().width / W;
+        while (e.clientX - lx >= cell) { g.key('ArrowRight'); lx += cell; moved = true; }
+        while (lx - e.clientX >= cell) { g.key('ArrowLeft'); lx -= cell; moved = true; }
+        if (Math.abs(e.clientY - sy) > cell * .8 && Math.abs(e.clientY - sy) > Math.abs(e.clientX - sx)) moved = true;
+        if (Date.now() - t0 > 220) while (e.clientY - ly >= cell) { g.key('ArrowDown'); ly += cell; moved = true; }
+      });
+      c.addEventListener('pointerup', function (e) {
+        if (sx === null) return;
+        var dy = e.clientY - sy, dt = Date.now() - t0;
+        if (!moved && Math.abs(e.clientX - sx) < 10 && Math.abs(dy) < 10) g.key('ArrowUp');
+        else if (dy > 40 && dt < 260 && Math.abs(dy) > Math.abs(e.clientX - sx)) g.key(' ');
+        sx = null;
+      });
+      c.addEventListener('pointercancel', function () { sx = null; });
+    })(cv.c);
     reset(); raf = requestAnimationFrame(frame);
     return { el: g.el, destroy: function () { cancelAnimationFrame(raf); } };
   }
@@ -174,9 +190,7 @@
   // ---------- Змейка ----------
   function snake() {
     var N = 16, CELL = 22;
-    var g = shell('snake', 'Стрелки или свайпы по полю', [
-      ['←', 'ArrowLeft'], ['↑', 'ArrowUp'], ['↓', 'ArrowDown'], ['→', 'ArrowRight']
-    ]);
+    var g = shell('snake', 'Смахивай по полю, куда ползти', 'Стрелки — куда ползти');
     var cv = canvas(N, N, CELL); g.field.insertBefore(cv.c, g.field.firstChild);
     var ctx = cv.ctx, body, dir, queue, food, score, dead, timer, started;
     var D = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
@@ -214,7 +228,7 @@
       if (!started && !dead) {
         ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0, 0, N * CELL, N * CELL);
         ctx.fillStyle = '#fff'; ctx.font = '500 16px Golos Text, system-ui'; ctx.textAlign = 'center';
-        ctx.fillText('Нажмите стрелку, чтобы начать', N * CELL / 2, N * CELL / 2);
+        ctx.fillText(touch ? 'Смахните, чтобы начать' : 'Нажмите стрелку, чтобы начать', N * CELL / 2, N * CELL / 2);
       }
     }
     g.key = function (k) {
@@ -232,9 +246,7 @@
 
   // ---------- 2048 ----------
   function g2048() {
-    var g = shell('g2048', 'Стрелки или свайпы. Соединяйте одинаковые числа', [
-      ['←', 'ArrowLeft'], ['↑', 'ArrowUp'], ['↓', 'ArrowDown'], ['→', 'ArrowRight']
-    ]);
+    var g = shell('g2048', 'Смахивай по полю. Соединяй одинаковые числа', 'Стрелки. Соединяйте одинаковые числа');
     var box = h('div', 'board2048'); g.field.insertBefore(box, g.field.firstChild);
     var cells = [], grid, score, won;
     for (var i = 0; i < 16; i++) { var c = h('div', 'c2048'); box.appendChild(c); cells.push(c); }

@@ -4,23 +4,16 @@
 .game-score { flex: 1; padding: 6px 12px; border-radius: 12px; background: rgba(255, 255, 255, .07); display: grid; }
 .game-score small { font-size: 11px; opacity: .6; }
 .game-score b { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.game-field { position: relative; width: 100%; max-width: 320px; }
+.game-field { position: relative; width: 100%; max-width: 340px; touch-action: none; user-select: none; -webkit-user-select: none; }
 .game-field canvas { display: block; width: 100%; border-radius: 14px; touch-action: none; }
-.game-tetris .game-field { max-width: 240px; }
+.game-tetris .game-field { max-width: 270px; }
 .game-over {
   position: absolute; inset: 0; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
   background: rgba(20, 18, 16, .78); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); text-align: center; padding: 20px;
 }
 .game-over b { font-size: 20px; font-weight: 600; }
 .game-over .btn { border-color: #f3eee6; background: #f3eee6; color: #191714; }
-.game-pad { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 320px; }
-.pad-btn {
-  width: 56px; height: 48px; border-radius: 14px; display: grid; place-items: center; text-align: center;
-  background: rgba(255, 255, 255, .1); font-size: 20px; touch-action: manipulation; user-select: none; -webkit-user-select: none;
-}
-.pad-btn:active { background: rgba(255, 255, 255, .22); }
-.pad-btn.wide { width: 72px; }
-.game-hint { font-size: 12px; opacity: .55; text-align: center; margin: 0; }
+.game-hint { font-size: 13px; opacity: .6; max-width: 300px; text-align: center; margin: 0; }
 
 /* 2048 */
 .board2048 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 8px; border-radius: 14px; background: #3a342c; aspect-ratio: 1; }
@@ -43,5 +36,4 @@
 .c2048[data-v="2048"] { background: #5f9e6e; color: #fff; font-size: 18px; }
 .c2048[data-v="big"] { background: #2c4d2a; color: #fff; font-size: 16px; }
 .win .game-field { max-width: 300px; }
-.win .game-tetris .game-field { max-width: 190px; }
-.win .game-pad .pad-btn { height: 40px; }
+.win .game-tetris .game-field { max-width: 240px; }

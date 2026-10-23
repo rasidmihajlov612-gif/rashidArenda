@@ -142,7 +142,7 @@
     page.appendChild(labels);
 
     var grid = h('div', 'grid');
-    ['about', 'cases', 'objects', 'reviews', 'steps', 'map', 'agency', 'settings'].forEach(function (id) { grid.appendChild(icon(id, true)); });
+    ['about', 'cases', 'objects', 'reviews', 'steps', 'map', 'settings'].forEach(function (id) { grid.appendChild(icon(id, true)); });
     grid.appendChild(folder());
     page.appendChild(grid);
     home.appendChild(page);

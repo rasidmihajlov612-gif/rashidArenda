@@ -189,7 +189,7 @@
     var groups = [
       ['about', 'cases', 'objects', 'reviews', 'steps', 'map', 'contact', 'settings'],
       ['tetris', 'snake', 'g2048'],
-      ['agency', S.telegram ? 'telegram' : null, S.whatsapp ? 'whatsapp' : null].filter(Boolean)
+      [S.telegram ? 'telegram' : null, S.whatsapp ? 'whatsapp' : null].filter(Boolean)
     ];
     groups.forEach(function (g, gi) {
       if (gi) dockEl.appendChild(h('span', 'dock-sep'));
