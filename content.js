@@ -22,7 +22,7 @@ window.SITE = {
   photo: "img/me/dog.jpg",
   avatar: "img/me/avatar.jpg",
   // Альбом «Личное» в «Фото»
-  personal: ["img/me/dog.jpg", "img/me/jacket.jpg", "img/me/suit.jpg", "img/me/sofa.jpg", "img/me/passport.jpg"],
+  personal: ["img/me/dog.jpg", "img/me/jacket.jpg", "img/me/suit.jpg", "img/me/passport.jpg"],
 
   // Приветствие на экране блокировки (айфон) и на экране входа (Мак)
   hello: "Приветствую! Это мой телефон, тут можно найти всё, что вас интересует. Только, пожалуйста, не балуйтесь с ним)",
