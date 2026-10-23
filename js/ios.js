@@ -45,7 +45,10 @@ window.IOS = (() => {
               </button>
               ${GRID.map(k => appBtn(k)).join('')}
             </div>
-            <div class="ios-search">${SYM.search} Поиск</div>
+            <div class="ios-under">
+              <span class="ios-search">${SYM.search} Поиск</span>
+              <button class="ios-switch" data-go="choose">Сменить устройство</button>
+            </div>
             <div class="ios-dock">${DOCK.map(k => appBtn(k, true)).join('')}</div>
           </div>
           <div class="ios-apps"></div>
@@ -54,6 +57,7 @@ window.IOS = (() => {
               <div class="lk-date"></div>
               <div class="lk-time"></div>
             </div>
+            <button class="lk-switch" data-go="choose">${SYM.chevL} Сменить устройство</button>
             <div class="lk-notes">
               ${notif('contacts', S.name, S.hello)}
               ${S.reviews[0] ? notif('reviews', S.reviews[0].from, S.reviews[0].messages[0]) : ''}
@@ -123,7 +127,7 @@ window.IOS = (() => {
   function bindLock() {
     let sy = null, dy = 0;
     lock.addEventListener('pointerdown', e => {
-      if (e.target.closest('.lk-note, .lk-round')) return;
+      if (e.target.closest('.lk-note, .lk-round, .lk-switch')) return;
       sy = e.clientY; dy = 0; lock.style.transition = 'none';
       lock.setPointerCapture(e.pointerId);
     });
@@ -234,7 +238,7 @@ window.IOS = (() => {
     v.className = 'view ' + (view.cls || '');
     v.innerHTML = view.bare ? view.html : `
       <header class="nav">
-        ${prev ? `<button class="nav-back">${SYM.chevL}<span>${esc(prev.dataset.title || 'Назад')}</span></button>` : '<span></span>'}
+        ${prev ? `<button class="nav-back">${SYM.chevL}<span>${esc(prev.dataset.title || 'Назад')}</span></button>` : `<button class="nav-back nav-home">${SYM.chevL}<span>Домой</span></button>`}
         <b class="nav-title">${esc(view.title || '')}</b>
         <span class="nav-right">${view.right || ''}</span>
       </header>
@@ -243,7 +247,8 @@ window.IOS = (() => {
     if (view.dark || APPS[current.k].dark) v.dataset.dark = '1';
     stack.appendChild(v);
     syncTone(v);
-    v.querySelectorAll('.nav-back, [data-pop]').forEach(b => b.addEventListener('click', pop));
+    v.querySelectorAll('.nav-back:not(.nav-home), [data-pop]').forEach(b => b.addEventListener('click', pop));
+    v.querySelectorAll('.nav-home').forEach(b => b.addEventListener('click', closeApp));
     const body = v.querySelector('.view-body');
     if (body && view.large !== false) body.addEventListener('scroll', () => v.classList.toggle('is-scrolled', body.scrollTop > 30));
     if (view.mount) view.mount(v);

@@ -45,6 +45,7 @@ window.Mac = (() => {
           <button class="mb-logo" data-menu="logo" aria-label="Меню">${LOGO}</button>
           <button class="mb-app" data-menu="app"></button>
           ${['Файл', 'Вид', 'Окно', 'Связаться'].map(m => `<button class="mb-item" data-menu="${m}">${m}</button>`).join('')}
+          <button class="mb-item mb-switch" data-act="switch">Сменить устройство</button>
           <span class="mb-spacer"></span>
           <span class="mb-status">${SYM.battery}</span>
           <span class="mb-status">${SYM.wifi}</span>
@@ -195,6 +196,7 @@ window.Mac = (() => {
       const b = e.target.closest('[data-menu]');
       if (b) { pop.hidden || pop.dataset.for !== b.dataset.menu ? openMenu(b) : closeMenu(); return; }
       if (e.target.closest('[data-act="spotlight"]')) openFinder('objects');
+      if (e.target.closest('[data-act="switch"]')) App.go('choose');
     });
     menubar.addEventListener('pointerover', e => {
       const b = e.target.closest('[data-menu]');
