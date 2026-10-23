@@ -8,6 +8,10 @@ window.SITE = {
   role: "Сдаю квартиры в Москве и области",
   agency: "Агентство Андрея Медведева",
   agencyUrl: "https://andreymedvedev.online/",
+  cianUrl: "https://mytishchi.cian.ru/company/121217343",
+  office: "2-й Кожевнический пер., 12, стр. 10",
+  mapsUrl: "https://yandex.ru/maps/org/agentstvo_andreya_medvedeva/16456873214",
+  hours: "24/7",
 
   // Контакты
   phone: "+7 924 769-80-50",

@@ -123,6 +123,7 @@
       if (Core.C.tel) items.push(['Позвонить ' + S.phone, function () { location.href = Core.C.tel; }]);
       if (Core.C.tg) items.push(['Написать в Telegram', function () { window.open(Core.C.tg, '_blank', 'noopener'); }]);
       if (Core.C.wa) items.push(['Написать в WhatsApp', function () { window.open(Core.C.wa, '_blank', 'noopener'); }]);
+      if (S.mapsUrl) items.push(['Офис на Яндекс Картах', function () { window.open(S.mapsUrl, '_blank', 'noopener'); }]);
       items.push('-', ['Карточка контакта', function () { open('contact'); }]);
       menu(mHelp, items);
     });

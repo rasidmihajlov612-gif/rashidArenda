@@ -265,7 +265,10 @@
         list.appendChild(slot(t, 'slot-chat'));
       });
     }
-    return { node: list, title: 'Сообщения', small: 'Сообщения', back: 'Отзывы' };
+    var wrapR = h('div');
+    wrapR.appendChild(list);
+    if (S.mapsUrl && S.reviews.length) wrapR.appendChild(link(h('a', 'all-reviews', 'Все отзывы на Яндекс Картах ›'), S.mapsUrl));
+    return { node: wrapR, title: 'Сообщения', small: 'Сообщения', back: 'Отзывы' };
   }
   function chatRow(name, text, pinned, where) {
     var b = h('button', 'chat-row' + (pinned ? ' pinned' : ''));
@@ -346,7 +349,14 @@
     sheet.appendChild(h('span', 'grabber'));
     sheet.appendChild(h('h3', null, 'Москва и область'));
     sheet.appendChild(h('p', null, nb('Сдаём квартиры в Москве и Подмосковье. Пришлите адрес, и я скажу, за сколько может сдаться квартира.')));
-    sheet.appendChild(contactButtons(h('div', 'btn-col')));
+    if (S.office) {
+      var rows = [{ label: S.office, sub: 'офис агентства', href: S.mapsUrl, tint: true }];
+      if (S.hours) rows.push({ label: 'На связи ' + S.hours, sub: 'по любым вопросам' });
+      sheet.appendChild(group('', rows));
+    }
+    var mb = contactButtons(h('div', 'btn-col'));
+    if (S.mapsUrl) mb.appendChild(link(h('a', 'btn', 'Открыть в Яндекс Картах'), S.mapsUrl));
+    sheet.appendChild(mb);
     w.appendChild(sheet);
     return { node: w, small: '', bare: true };
   }
@@ -379,8 +389,10 @@
     if (S.phone) rows.push({ label: S.phone, sub: 'мобильный', href: C.tel, tint: true });
     if (S.telegram) rows.push({ label: '@' + S.telegram, sub: 'telegram', href: C.tg, tint: true });
     rows.push({ label: S.agency, sub: 'работа', href: S.agencyUrl, tint: true });
+    if (S.office) rows.push({ label: S.office, sub: 'офис', href: S.mapsUrl, tint: true });
+    if (S.hours) rows.push({ label: S.hours, sub: 'на связи' });
     w.appendChild(group('', rows));
-    w.appendChild(group('', [{ label: 'Собственник агентству не платит. Комиссию платит наниматель.', sub: 'заметки' }]));
+    w.appendChild(group('', [{ label: 'Ваш персональный менеджер. Собственник агентству не платит, комиссию платит наниматель.', sub: 'заметки' }]));
     return { node: w, small: '', back: 'Контакты', grouped: true };
   }
 
@@ -404,11 +416,14 @@
       { label: 'Ещё', value: 'продажа и покупка' },
       { label: 'Агентство', value: 'А. Медведева' },
       { label: 'Где', value: 'Москва и область' },
+      { label: 'На связи', value: S.hours || '' },
       { label: 'Комиссия для собственника', value: '0 ₽' }
     ]));
     w.appendChild(group('Агентство', [
       { label: 'Сайт агентства', icon: 'safari', href: S.agencyUrl },
-      { label: 'Профиль на Циане', icon: 'home', href: 'https://mytishchi.cian.ru/company/121217343' }
+      { label: 'Профиль на Циане', icon: 'home', href: S.cianUrl },
+      { label: 'Отзывы на Яндекс Картах', icon: 'maps', href: S.mapsUrl },
+      { label: 'Офис', value: S.office }
     ], 'Агентство работает с 2018 года, документы проверены Циан.'));
     var rows = [];
     if (C.tel) rows.push({ label: 'Позвонить', icon: 'phone', href: C.tel });

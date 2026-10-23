@@ -167,3 +167,8 @@ a.cell:active, button.cell:active { background: #e5e5ea; }
 .me-cell { min-height: 76px; }
 .me-ava { width: 60px; height: 60px; font-size: 26px; }
 .me-name { font-size: 21px; font-weight: 500; }
+
+.all-reviews { display: block; text-align: center; color: var(--blue); font-size: 15px; padding: 18px 0 6px; }
+.map-sheet .group { margin: 14px 0 0; }
+.map-sheet .group-list { background: var(--bg-grouped); }
+.map-sheet .cell-text .cell-sub { order: -1; }
