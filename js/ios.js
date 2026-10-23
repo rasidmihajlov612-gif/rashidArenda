@@ -22,7 +22,7 @@ window.IOS = (() => {
     whatsapp: { name: 'WhatsApp',  icon: 'whatsapp', href: C.wa },
     mac:      { name: 'Мак',       icon: 'mac' },
   };
-  const GRID = ['objects', 'cases', 'reviews', 'photos', 'tetris', 'snake', 'g2048', 'mac'];
+  const GRID = ['objects', 'cases', 'reviews', 'photos', 'tetris', 'snake', 'g2048'];
   const DOCK = ['phone', 'telegram', 'whatsapp', 'contacts'].filter(k => !APPS[k].hasOwnProperty('href') || APPS[k].href);
 
   function mount(el, opts) {
