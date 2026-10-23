@@ -57,6 +57,19 @@ a.cell:active, button.cell:active { background: #e5e5ea; }
 .album b { font-weight: 400; font-size: 15px; line-height: 1.25; }
 .album > span:last-child { font-size: 15px; color: var(--label-2); }
 .slot-album { aspect-ratio: 1; }
+.text-cover, .case-hero {
+  display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: #fff; text-align: left;
+  background: radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, .35), transparent 60%), var(--c);
+}
+.text-cover b { font-size: 24px; font-weight: 700; letter-spacing: -.03em; line-height: 1.05; }
+.text-cover small { font-size: 12px; opacity: .85; margin-top: 3px; }
+.case-hero { border-radius: 16px; min-height: 170px; padding: 18px; margin-bottom: 16px; }
+.case-hero b { font-size: 44px; font-weight: 700; letter-spacing: -.04em; line-height: 1; }
+.case-hero small { font-size: 15px; opacity: .9; margin-top: 6px; }
+.case-review-box { margin: 22px 0 4px; }
+.case-review { background: var(--bg-grouped); border-radius: 12px; padding-left: 12px; }
+.case-review .chat-text { border: 0; padding-right: 12px; }
+.case-review .chat-top small { color: #ff9f0a; font-size: 12px; letter-spacing: 1px; }
 .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin: 0 -16px 16px; }
 .shots.one { grid-template-columns: 1fr; }
 .shot img { width: 100%; aspect-ratio: 1; object-fit: cover; }

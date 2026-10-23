@@ -127,11 +127,9 @@
     if (S.cases.length) {
       S.cases.forEach(function (c) {
         var b = h('button', 'album');
-        var cover = h('span', 'album-cover');
-        if (c.photos && c.photos[0]) cover.style.backgroundImage = 'url("' + c.photos[0] + '")';
-        b.appendChild(cover);
+        b.appendChild(caseCover(c, 'album-cover'));
         b.appendChild(h('b', null, c.title));
-        b.appendChild(h('span', null, (c.facts && c.facts[0]) || String((c.photos || []).length)));
+        b.appendChild(h('span', null, c.sub || (c.facts && c.facts[0]) || String((c.photos || []).length)));
         b.addEventListener('click', function () { nav.push(viewCase(c, nav)); });
         g.appendChild(b);
       });
@@ -172,11 +170,33 @@
     list.forEach(function (t) { f.appendChild(h('span', null, t)); });
     return f;
   }
+  // Обложка кейса: фото, а если его нет — крупная цифра на цветном фоне
+  function caseCover(c, cls) {
+    var cover = h('span', cls);
+    if (c.photos && c.photos[0]) { cover.style.backgroundImage = 'url("' + c.photos[0] + '")'; return cover; }
+    cover.classList.add('text-cover');
+    cover.style.setProperty('--c', c.color || '#007aff');
+    cover.appendChild(h('b', null, c.big || ''));
+    if (c.sub) cover.appendChild(h('small', null, c.sub));
+    return cover;
+  }
   function viewCase(c, nav) {
     var w = h('div', 'detail');
     if (c.photos && c.photos.length) w.appendChild(shots(c.photos, c.title, nav));
+    else if (c.big) w.appendChild(caseCover(c, 'case-hero'));
     if (c.facts && c.facts.length) w.appendChild(chips(c.facts));
     if (c.story) String(c.story).split(/\n+/).forEach(function (p) { w.appendChild(h('p', 'story', nb(p))); });
+    var r = c.review && S.reviews.filter(function (x) { return x.from === c.review; })[0];
+    if (r) {
+      var rb = chatRow(r.from, r.messages[0], false, '★★★★★'.slice(0, r.stars || 5));
+      rb.classList.add('case-review');
+      rb.addEventListener('click', function () { nav.push(viewChat(r)); });
+      var box = h('div', 'case-review-box');
+      box.appendChild(h('p', 'group-head', 'Отзыв об этом'));
+      box.appendChild(rb);
+      w.appendChild(box);
+    }
+    w.appendChild(contactButtons(h('div', 'btn-col')));
     return { node: w, title: c.title, small: c.title };
   }
   function viewPhoto(src, title) {
