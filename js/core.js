@@ -14,6 +14,7 @@ window.Core = (() => {
       localStorage.setItem('rm-' + key, JSON.stringify(val));
     } catch (e) { return null; }
   };
+  const motionDuration = ms => matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ms;
   const stars = n => '★★★★★'.slice(0, n || 5);
   const initials = s => String(s).trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
   // Мягкие цвета для аватаров отзывов
@@ -46,5 +47,5 @@ window.Core = (() => {
 
   const reviewByName = name => S.reviews.findIndex(r => r.from === name);
 
-  return { S, C, esc, nb, h, store, stars, initials, TINTS, ext, avatarStyle, contactButtons, notes, reviewByName };
+  return { motionDuration, S, C, esc, nb, h, store, stars, initials, TINTS, ext, avatarStyle, contactButtons, notes, reviewByName };
 })();

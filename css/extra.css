@@ -197,3 +197,20 @@ a.tb-btn { text-decoration: none; }
 .app.is-dark .nav-back { color: #0a84ff; }
 .v-contact .nav { visibility: visible; }
 .mb-switch { color: var(--accent); }
+
+/* Телефон сохраняет ту же фотографическую палитру, что и рабочий стол. */
+.ios-wall { background: linear-gradient(165deg,rgba(38,58,54,.44),rgba(15,35,32,.83)),url(../img/objects/lesnyh-ozer/1.jpg) center / cover; }
+.lk-note { background: rgba(28,37,31,.56); }
+.ios-viewport.is-framed { background: #e6e8df; }
+.v-objects .obj-row { display: grid; grid-template-columns: 1fr; padding: 0 0 15px; gap: 11px; overflow: hidden; }
+.v-objects .obj-row .thumb { width: 100%; aspect-ratio: 2; border-radius: 0; }
+.obj-row .deck-txt { padding: 0 15px; }
+:focus-visible { outline: 3px solid #307f80; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  .dock-item { --mag: 1 !important; }
+}
+.game-choice { gap: 12px; justify-content: flex-start; }
+.game-choice .appicon { width: 32px; height: 32px; flex: none; border-radius: 8px; }
+.game-choice > .sym { margin-left: auto; }
+.view.v-game { background: #000; color: #fff; }

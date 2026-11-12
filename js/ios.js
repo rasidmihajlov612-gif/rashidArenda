@@ -14,6 +14,7 @@ window.IOS = (() => {
     photos:   { name: 'Фото',      icon: 'photos',   root: photosRoot },
     notes:    { name: 'Заметки',   icon: 'notes',    root: notesRoot },
     contacts: { name: 'Контакты',  icon: 'contacts', root: contactsRoot },
+    games:    { name: 'Игры', icon: 'tetris', root: gamesRoot },
     tetris:   { name: 'Тетрис',    icon: 'tetris',   root: () => gameRoot('tetris'), dark: true },
     snake:    { name: 'Змейка',    icon: 'snake',    root: () => gameRoot('snake'), dark: true },
     g2048:    { name: '2048',      icon: 'g2048',    root: () => gameRoot('g2048'), dark: true },
@@ -22,13 +23,14 @@ window.IOS = (() => {
     whatsapp: { name: 'WhatsApp',  icon: 'whatsapp', href: C.wa },
     mac:      { name: 'Мак',       icon: 'mac' },
   };
-  const GRID = ['objects', 'cases', 'reviews', 'photos', 'tetris', 'snake', 'g2048'];
+  const GRID = ['objects', 'cases', 'reviews', 'photos', 'games'];
   const DOCK = ['phone', 'telegram', 'whatsapp', 'contacts'].filter(k => !APPS[k].hasOwnProperty('href') || APPS[k].href);
 
   function mount(el, opts) {
     root = el; framed = opts.framed;
     root.classList.toggle('is-framed', framed);
-    const about = notes[0];
+    const reviewIndex = reviewByName('Марина М');
+    const review = S.reviews[reviewIndex];
     root.innerHTML = `
       ${framed ? `<div class="ios-aside">
         <button data-go="choose">${SYM.chevL} Другое устройство</button>
@@ -40,8 +42,8 @@ window.IOS = (() => {
             <div class="ios-grid">
               <button class="widget w-notes" data-open="notes">
                 <span class="w-head">${ICONS.app('notes', 'mini')}<b>Заметки</b></span>
-                <span class="w-title">${esc(about.title)}</span>
-                <span class="w-text">${esc(about.paras.slice(0, 3).join(' '))}</span>
+                <span class="w-title">${esc(S.welcome.title)}</span>
+                <span class="w-text">${esc(S.welcome.text)}</span>
               </button>
               ${GRID.map(k => appBtn(k)).join('')}
             </div>
@@ -60,7 +62,7 @@ window.IOS = (() => {
             <button class="lk-switch" data-go="choose">${SYM.chevL} Сменить устройство</button>
             <div class="lk-notes">
               ${notif('contacts', S.name, S.hello)}
-              ${S.reviews[0] ? notif('reviews', S.reviews[0].from, S.reviews[0].messages[0]) : ''}
+              ${review ? notif('reviews', review.from, review.preview || review.messages[0], reviewIndex) : ''}
             </div>
             <div class="lk-bottom">
               <button class="lk-round" data-naughty="torch">${SYM.flashlight}</button>
@@ -86,7 +88,10 @@ window.IOS = (() => {
     homebar = root.querySelector('.ios-homebar');
 
     root.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => App.go(b.dataset.go)));
-    root.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openApp(b.dataset.open, b)));
+    root.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
+      openApp(b.dataset.open, b);
+      if (b.classList.contains('w-notes')) push(noteView(notes[0]), false);
+    }));
     bindLock();
     bindHomebar();
     tick(); setInterval(tick, 15000);
@@ -101,8 +106,8 @@ window.IOS = (() => {
     if (a.href) return `<a class="ios-app" href="${esc(a.href)}"${ext(a.href)} aria-label="${esc(a.name)}">${inner}</a>`;
     return `<button class="ios-app" data-open="${k}" aria-label="${esc(a.name)}">${inner}</button>`;
   }
-  function notif(app, title, text) {
-    return `<button class="lk-note" data-note="${app}">
+  function notif(app, title, text, reviewIndex = null) {
+    return `<button class="lk-note" data-note="${app}"${reviewIndex == null ? '' : ` data-review="${reviewIndex}"`}>
       ${ICONS.app(app === 'contacts' ? 'messages' : APPS[app].icon, 'mini')}
       <span class="lk-note-body"><span class="lk-note-head"><b>${esc(title)}</b><em>сейчас</em></span><span>${esc(nb(text))}</span></span></button>`;
   }
@@ -144,7 +149,11 @@ window.IOS = (() => {
       if (dy < -70 || Math.abs(dy) < 6) unlock(); else { lock.style.transform = ''; lock.style.opacity = ''; }
     });
     lock.querySelectorAll('.lk-note').forEach(n => n.addEventListener('click', () => {
-      unlock(() => openApp(n.dataset.note, home.querySelector(`[data-open="${n.dataset.note}"]`)));
+      const from = rectIn(n);
+      unlock(() => {
+        openApp(n.dataset.note, home.querySelector(`[data-open="${n.dataset.note}"]`), from);
+        if (n.hasAttribute('data-review')) push(chatView(Number(n.dataset.review)), false);
+      });
     }));
     // «Не балуйтесь»: фонарик мигает, камера трясёт телефон
     lock.querySelectorAll('[data-naughty]').forEach(b => b.addEventListener('click', e => {
@@ -153,13 +162,13 @@ window.IOS = (() => {
       screenEl.animate(torch
         ? [{ boxShadow: 'inset 0 0 0 999px rgba(255,255,255,.9)' }, { boxShadow: 'inset 0 0 0 999px rgba(255,255,255,0)' }]
         : [{ transform: 'translateX(0)' }, { transform: 'translateX(-7px)' }, { transform: 'translateX(7px)' }, { transform: 'translateX(-4px)' }, { transform: 'translateX(0)' }],
-        { duration: torch ? 500 : 380 });
+        { duration: Core.motionDuration(torch ? 500 : 380) });
       const box = lock.querySelector('.lk-notes');
       const old = box.querySelector('.is-naughty'); if (old) old.remove();
       box.insertAdjacentHTML('afterbegin', notif('contacts', S.name, torch ? 'Просил же не баловаться)' : 'Фото квартир лучше посмотрите в «Объектах»)'));
       const n = box.firstElementChild;
       n.classList.add('is-naughty');
-      n.animate([{ transform: 'translateY(-14px) scale(.96)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      n.animate([{ transform: 'translateY(-14px) scale(.96)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: Core.motionDuration(380), easing: 'cubic-bezier(.2,.8,.2,1)' });
       n.addEventListener('click', () => unlock(() => openApp('objects')));
     }));
   }
@@ -169,8 +178,8 @@ window.IOS = (() => {
     lock.classList.add('is-gone');
     lock.style.transform = ''; lock.style.opacity = '';
     screenEl.classList.add('is-unlocked');
-    home.animate([{ transform: 'scale(1.08)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
-    if (then) setTimeout(then, 280);
+    home.animate([{ transform: 'scale(1.08)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: Core.motionDuration(420), easing: 'cubic-bezier(.2,.8,.2,1)' });
+    if (then) setTimeout(then, Core.motionDuration(140));
   }
 
   /* ---------- жест «домой» ---------- */
@@ -194,7 +203,7 @@ window.IOS = (() => {
     return { x: (r.left - s.left) / scale, y: (r.top - s.top) / scale, w: r.width / scale, h: r.height / scale };
   }
 
-  function openApp(k, fromEl) {
+  function openApp(k, fromEl, launchRect) {
     if (k === 'mac') return App.go('mac');
     if (current) return;
     const a = APPS[k];
@@ -207,11 +216,11 @@ window.IOS = (() => {
     push(a.root(), false);
     screenEl.classList.add('in-app');
 
-    const W = screenEl.clientWidth, H = screenEl.clientHeight, f = current.from;
+    const W = screenEl.clientWidth, H = screenEl.clientHeight, f = launchRect || current.from;
     const start = f ? `translate(${f.x}px, ${f.y}px) scale(${f.w / W}, ${f.h / H})` : 'scale(.9)';
     el.animate([{ transform: start, borderRadius: '60px', opacity: f ? 1 : 0 }, { transform: 'none', borderRadius: '46px', opacity: 1 }],
-      { duration: 420, easing: 'cubic-bezier(.2,.9,.25,1)' });
-    home.animate([{ transform: 'none' }, { transform: 'scale(.9)', opacity: .6 }], { duration: 420, easing: 'cubic-bezier(.2,.9,.25,1)', fill: 'forwards' });
+      { duration: Core.motionDuration(420), easing: 'cubic-bezier(.2,.9,.25,1)' });
+    home.animate([{ transform: 'none' }, { transform: 'scale(.9)', opacity: .6 }], { duration: Core.motionDuration(420), easing: 'cubic-bezier(.2,.9,.25,1)', fill: 'forwards' });
   }
 
   function closeApp() {
@@ -223,10 +232,10 @@ window.IOS = (() => {
     const W = screenEl.clientWidth, H = screenEl.clientHeight;
     const end = from ? `translate(${from.x}px, ${from.y}px) scale(${from.w / W}, ${from.h / H})` : 'scale(.9)';
     const a = el.animate([{ transform: 'none', borderRadius: '46px', opacity: 1 }, { transform: end, borderRadius: '90px', opacity: from ? .4 : 0 }],
-      { duration: 340, easing: 'cubic-bezier(.4,0,.2,1)' });
+      { duration: Core.motionDuration(340), easing: 'cubic-bezier(.4,0,.2,1)' });
     a.onfinish = () => el.remove();
     home.getAnimations().forEach(x => x.cancel());
-    home.animate([{ transform: 'scale(.9)', opacity: .6 }, { transform: 'none', opacity: 1 }], { duration: 340, easing: 'cubic-bezier(.2,.8,.3,1)' });
+    home.animate([{ transform: 'scale(.9)', opacity: .6 }, { transform: 'none', opacity: 1 }], { duration: Core.motionDuration(340), easing: 'cubic-bezier(.2,.8,.3,1)' });
   }
 
   /* ---------- стек экранов внутри приложения ---------- */
@@ -254,7 +263,7 @@ window.IOS = (() => {
     if (view.mount) view.mount(v);
     if (view.destroy) { v._destroy = view.destroy; current.destroys.push(view.destroy); }
     if (animate && prev) {
-      const e = { duration: 380, easing: 'cubic-bezier(.2,.8,.2,1)' };
+      const e = { duration: Core.motionDuration(380), easing: 'cubic-bezier(.2,.8,.2,1)' };
       v.animate([{ transform: 'translateX(100%)' }, { transform: 'none' }], e);
       prev.animate([{ transform: 'none' }, { transform: 'translateX(-30%)', filter: 'brightness(.9)' }], { ...e, fill: 'forwards' });
     }
@@ -265,7 +274,7 @@ window.IOS = (() => {
     const v = stack.lastElementChild, prev = v.previousElementSibling;
     if (!prev) return;
     if (v._destroy) { v._destroy(); current.destroys = current.destroys.filter(f => f !== v._destroy); }
-    const e = { duration: 320, easing: 'cubic-bezier(.3,.7,.3,1)' };
+    const e = { duration: Core.motionDuration(320), easing: 'cubic-bezier(.3,.7,.3,1)' };
     v.animate([{ transform: 'none' }, { transform: 'translateX(100%)' }], e).onfinish = () => v.remove();
     prev.getAnimations().forEach(x => x.cancel());
     syncTone(prev);
@@ -452,6 +461,15 @@ window.IOS = (() => {
   }
 
   /* ---------- Игры ---------- */
+  function gamesRoot() {
+    return {
+      title: 'Игры',
+      html: `<div class="group">${['tetris','snake','g2048'].map(k =>
+        `<button class="row game-choice" data-game="${k}">${ICONS.app(APPS[k].icon,'mini')}${esc(APPS[k].name)} ${SYM.chevR}</button>`).join('')}</div>`,
+      mount: view => tap(view, '[data-game]', b => push(gameRoot(b.dataset.game))),
+    };
+  }
+
   function gameRoot(k) {
     const g = Games[k]();
     return {

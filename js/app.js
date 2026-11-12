@@ -4,7 +4,7 @@
   const macEl = document.getElementById('mac');
   const iosEl = document.getElementById('ios');
 
-  const isPhone = matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 600;
+  const isPhone = innerWidth < 760 || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 600);
   const suggested = isPhone ? 'ios' : 'mac';
 
   chooser.querySelectorAll('.device-pick').forEach(btn => {
@@ -28,13 +28,16 @@
   }
 
   function go(mode) {
-    const hash = mode === 'choose' ? '' : '#' + mode;
-    if (location.hash !== hash) history.pushState(null, '', hash || location.pathname);
+    const hash = '#' + mode;
+    if (location.hash !== hash) history.pushState(null, '', hash);
     show(mode);
   }
 
   window.App = { go };
   addEventListener('popstate', () => show(current()));
-  function current() { return location.hash === '#mac' ? 'mac' : location.hash === '#ios' ? 'ios' : 'choose'; }
+  function current() {
+    const mode = location.hash.slice(1);
+    return ['mac', 'ios', 'choose'].includes(mode) ? mode : suggested;
+  }
   show(current());
 })();

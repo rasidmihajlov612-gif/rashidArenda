@@ -17,7 +17,7 @@ window.Mac = (() => {
     g2048:    { name: '2048',      icon: 'g2048',    open: () => openGame('g2048') },
     iphone:   { name: 'iPhone',    icon: 'iphone',   open: () => App.go('ios') },
   };
-  const DOCK = ['finder', 'notes', 'messages', 'viewer', 'contacts', '|', 'tetris', 'snake', 'g2048', '|', 'iphone'];
+  const DOCK = ['finder', 'notes', 'messages', 'viewer', 'contacts', '|', 'iphone'];
 
   const FOLDERS = [
     { id: 'objects', title: 'Объекты', sec: 'Аренда' },
@@ -81,9 +81,7 @@ window.Mac = (() => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'w') { e.preventDefault(); const a = activeWin(); if (a) closeWin(a.key); }
     });
 
-    openNotes('about', { x: 70, y: 60, silent: true });
-    openFinder('objects');
-    setTimeout(toast, 1400);
+    openNotes('about', { x: Math.max(28, (stageW() - 1020) * .42), y: Math.max(38, (stageH() - 565) * .37) });
   }
 
   function onShow() { fit(); }
@@ -109,21 +107,11 @@ window.Mac = (() => {
     vp.querySelector('.mb-clock').textContent = `${wd[0].toUpperCase() + wd.slice(1)} ${dm} ${t}`;
   }
 
-  // Уведомление-приветствие в правом верхнем углу
-  function toast() {
-    const t = document.createElement('button');
-    t.className = 'mac-toast';
-    t.innerHTML = `${ICONS.app('messages', 'mini')}<span class="mt-body"><span class="mt-head"><b>${esc(S.name)}</b><em>сейчас</em></span><span>${esc(nb(S.helloMac))}</span></span>`;
-    t.addEventListener('click', () => { t.remove(); openChat(-1); });
-    stage.appendChild(t);
-    setTimeout(() => { t.classList.add('is-gone'); setTimeout(() => t.remove(), 500); }, 12000);
-  }
-
   /* ---------------- иконки на столе ---------------- */
   function buildDesktopIcons() {
     const box = vp.querySelector('.desk-icons');
     const items = [
-      ...FOLDERS.map(f => ({ label: f.title, art: ICONS.folder(), open: () => openFinder(f.id) })),
+      ...FOLDERS.map(f => ({ label: f.title, art: ICONS.folder('#9ac4bd', '#4f847e'), open: source => openFinder(f.id, { source }) })),
       { label: 'Обо мне.txt', art: ICONS.doc('TXT'), open: () => openNotes('about') },
       { label: 'Контакты.vcf', art: ICONS.doc('VCF', '#0a84ff'), open: openAbout },
     ];
@@ -131,12 +119,7 @@ window.Mac = (() => {
       const b = document.createElement('button');
       b.className = 'desk-icon';
       b.innerHTML = `<span class="di-art">${it.art}</span><span class="di-label">${esc(it.label)}</span>`;
-      b.addEventListener('click', e => {
-        box.querySelectorAll('.is-sel').forEach(i => i.classList.remove('is-sel'));
-        b.classList.add('is-sel');
-        if (e.pointerType === 'touch') it.open();
-      });
-      b.addEventListener('dblclick', it.open);
+      b.addEventListener('click', () => it.open(b));
       box.appendChild(b);
     });
   }
@@ -181,7 +164,7 @@ window.Mac = (() => {
   }
 
   function bounce(b) {
-    b.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-18px)' }, { transform: 'translateY(0)' }], { duration: 420, easing: 'cubic-bezier(.3,.7,.4,1)' });
+    b.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-18px)' }, { transform: 'translateY(0)' }], { duration: Core.motionDuration(420), easing: 'cubic-bezier(.3,.7,.4,1)' });
   }
 
   function refreshDock() {
@@ -297,7 +280,9 @@ window.Mac = (() => {
     makeDraggable(w);
     if (o.onMount) o.onMount(el, w);
 
-    if (!o.silent) el.animate([{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.2,.8,.3,1)' });
+    w.source = o.source;
+    el.animate([windowStart(el, w.source), { opacity: 1, transform: 'none' }],
+      { duration: Core.motionDuration(245), easing: 'cubic-bezier(.22,.72,.24,1)' });
     focus(o.key);
     refreshDock();
     return w;
@@ -324,11 +309,21 @@ window.Mac = (() => {
     });
   }
 
+  function windowStart(el, source) {
+    if (!source?.isConnected) return { opacity: 0, transform: 'translateY(8px) scale(.985)' };
+    const origin = source.getBoundingClientRect();
+    if (!origin.width) return { opacity: 0, transform: 'scale(.98)' };
+    const win = el.getBoundingClientRect();
+    const dx = (origin.left + origin.width / 2 - win.left - win.width / 2) / scale;
+    const dy = (origin.top + origin.height / 2 - win.top - win.height / 2) / scale;
+    return { opacity: 0, transform: `translate(${dx}px, ${dy}px) scale(${Math.min(.65, origin.width / win.width)})` };
+  }
+
   function closeWin(key) {
     const w = wins.get(key); if (!w) return;
     wins.delete(key);
     if (w.onClose) w.onClose();
-    const a = w.el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.96)' }], { duration: 150, easing: 'ease-in' });
+    const a = w.el.animate([{ opacity: 1, transform: 'none' }, windowStart(w.el, w.source)], { duration: Core.motionDuration(175), easing: 'ease-in' });
     a.onfinish = () => w.el.remove();
     const top = [...wins.values()].filter(x => !x.minimized).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
     setActive(top ? top.key : null);
@@ -350,8 +345,8 @@ window.Mac = (() => {
     const a = el.animate([
       { transform: 'none', opacity: 1 },
       { transform: `translate(${t.x - cx}px, ${t.y - cy}px) scale(.06)`, opacity: .2 },
-    ], { duration: 380, easing: 'cubic-bezier(.5,0,.7,.4)' });
-    a.onfinish = () => { el.hidden = true; };
+    ], { duration: Core.motionDuration(380), easing: 'cubic-bezier(.5,0,.7,.4)' });
+    a.onfinish = () => { if (w.minimized) el.hidden = true; };
     const top = [...wins.values()].filter(x => !x.minimized).sort((a, b) => b.el.style.zIndex - a.el.style.zIndex)[0];
     setActive(top ? top.key : null);
   }
@@ -364,7 +359,7 @@ window.Mac = (() => {
     el.animate([
       { transform: `translate(${t.x - cx}px, ${t.y - cy}px) scale(.06)`, opacity: .2 },
       { transform: 'none', opacity: 1 },
-    ], { duration: 340, easing: 'cubic-bezier(.2,.7,.3,1)' });
+    ], { duration: Core.motionDuration(340), easing: 'cubic-bezier(.2,.7,.3,1)' });
     focus(key);
   }
 
@@ -392,7 +387,7 @@ window.Mac = (() => {
     const key = opts.fresh ? 'finder:' + Date.now() : 'finder';
     const secs = [...new Set(FOLDERS.map(f => f.sec))];
     return openWindow({
-      key, app: 'finder', title: 'Finder', cls: 'finder', w: 860, h: 520,
+      key, source: opts.source, app: 'finder', title: 'Finder', cls: 'finder', w: 860, h: 520,
       html: `<aside class="side" data-drag>
           <div class="side-head"></div>
           ${secs.map(sec => `<div class="side-sec">${esc(sec)}</div>
@@ -438,11 +433,12 @@ window.Mac = (() => {
     el.querySelector('[data-back]').disabled = el._hist.length < 2;
     el.querySelectorAll('.side-item').forEach(b => b.classList.toggle('is-on', b.dataset.f === folder));
     const grid = el.querySelector('.f-grid');
+    grid.classList.toggle('property-grid', folder === 'objects');
     const note = el.querySelector('.f-note');
     let items = [], hint = '';
     if (folder === 'objects') {
-      hint = 'Сдаются сейчас. Двойной клик — фото и подробности.';
-      items = S.objects.map((o, i) => ({ name: o.title, art: photoThumb(o.photos[0]), meta: `${o.price.replace(' в месяц', '')} · ${o.metro}`, open: () => openObject(i) }));
+      hint = 'Квартиры в аренду';
+      items = S.objects.map((o, i) => ({ name: o.title, art: photoThumb(o.photos[0]), meta: `${o.price.replace(' в месяц', '')} · ${o.metro}`, open: source => openObject(i, source) }));
     } else if (folder === 'cases') {
       items = S.cases.map((c, i) => ({ name: c.title, art: caseThumb(c), meta: c.sub, open: () => openNotes('case' + i) }));
     } else if (folder === 'reviews') {
@@ -465,12 +461,7 @@ window.Mac = (() => {
       const b = document.createElement('button');
       b.className = 'f-item';
       b.innerHTML = `<span class="f-art">${it.art}</span><span class="f-name">${esc(it.name)}</span><span class="f-meta">${esc(it.meta || '')}</span>`;
-      b.addEventListener('click', e => {
-        grid.querySelectorAll('.is-sel').forEach(x => x.classList.remove('is-sel'));
-        b.classList.add('is-sel');
-        if (e.pointerType === 'touch') it.open();
-      });
-      b.addEventListener('dblclick', it.open);
+      b.addEventListener('click', () => it.open(b));
       grid.appendChild(b);
     });
     const fw = [...wins.values()].find(w => w.el === el);
@@ -480,10 +471,10 @@ window.Mac = (() => {
   function plural(n, a, b, c) { const m = n % 10, k = n % 100; return m === 1 && k !== 11 ? a : m >= 2 && m <= 4 && (k < 12 || k > 14) ? b : c; }
 
   /* ---------------- Просмотр: объект с фото ---------------- */
-  function openObject(i) {
+  function openObject(i, source) {
     const o = S.objects[i];
     return openWindow({
-      key: 'obj:' + i, app: 'viewer', title: o.title, cls: 'viewer', w: 1040, h: 640,
+      key: 'obj:' + i, source, app: 'viewer', title: o.title, cls: 'viewer', w: 1040, h: 640,
       html: `<div class="toolbar v-bar" data-drag>
           <span class="tb-gap"></span><button class="tb-btn">${SYM.sidebar}</button>
           <span class="v-title"><b>${esc(o.title)} · ${esc(o.price)}</b><span class="v-page"></span></span>
@@ -590,13 +581,14 @@ window.Mac = (() => {
   /* ---------------- Заметки ---------------- */
   function openNotes(id, extra = {}) {
     return openWindow({
-      key: 'notes', app: 'notes', title: 'Заметки', cls: 'notes', w: 760, h: 520, ...extra,
+      key: 'notes', app: 'notes', title: 'Заметки', cls: 'notes', w: 904, h: 552, ...extra,
       html: `<aside class="n-list" data-drag>
           <div class="side-head"></div>
-          <div class="n-rows">${notes.map(n => `<button class="n-row" data-id="${n.id}"><b>${esc(n.title)}</b><span><em>${esc(n.date)}</em> ${esc(n.paras[0])}</span></button>`).join('')}</div>
+          <div class="n-sidebar-title">Заметки</div>
+          <div class="n-rows">${notes.map(n => `<button class="n-row" data-id="${n.id}"><b>${esc(n.id === 'about' ? 'Знакомство' : n.title)}</b><span>${esc(n.id === 'about' ? S.name : n.date)}</span></button>`).join('')}</div>
         </aside>
         <div class="n-main">
-          <div class="toolbar" data-drag><span class="tb-spacer"></span><button class="tb-btn">${SYM.list}</button><button class="tb-btn">${SYM.share}</button><button class="tb-btn">${SYM.search}</button></div>
+          <div class="toolbar note-bar" data-drag>${SYM.list}<span>Записная книжка</span></div>
           <article class="n-body"></article>
         </div>`,
       onMount: el => {
@@ -612,14 +604,28 @@ window.Mac = (() => {
     const c = n.caseIdx != null ? S.cases[n.caseIdx] : null;
     const ri = c && c.review ? reviewByName(c.review) : -1;
     const body = el.querySelector('.n-body');
+    body.classList.toggle('is-welcome', n.id === 'about');
+    if (n.id === 'about') {
+      const intro = S.welcome;
+      body.innerHTML = `<div class="welcome-spread">
+        <div class="welcome-copy"><span class="welcome-region">${esc(intro.region)}</span>
+          <h1>${esc(intro.title)}</h1><p>${esc(nb(intro.text))}</p>
+          <a class="welcome-action" href="${esc(C.tg)}"${ext(C.tg)}>${esc(intro.action)} <span aria-hidden="true">↗</span></a>
+        </div>
+        <figure class="welcome-portrait"><img src="${esc(intro.portrait)}" alt="${esc(S.name)}">
+          <figcaption>${esc(S.name)}</figcaption></figure>
+        </div>
+        <details class="welcome-bio"><summary>Обо мне</summary>${n.paras.map(t => `<p>${esc(nb(t))}</p>`).join('')}</details>`;
+      body.scrollTop = 0;
+      return;
+    }
     body.innerHTML = `<p class="n-date">${esc(n.date)}</p>
-      ${n.id === 'about' ? `<div class="n-me">${meAva()}<span><b>${esc(S.name)}</b><span>${esc(S.role)}</span></span></div>` : ''}
       <h1>${esc(n.title)}</h1>
       ${c ? `<div class="case-cover" style="--c:${c.color}"><b>${esc(c.big)}</b><span>${esc(c.sub || '')}</span></div>
         <div class="chips">${(c.facts || []).map(f => `<span>${esc(f)}</span>`).join('')}</div>` : ''}
       ${n.paras.map(t => `<p>${esc(nb(t))}</p>`).join('')}
       ${ri >= 0 ? `<button class="n-review" data-i="${ri}">${reviewAva(S.reviews[ri], ri, 'sm')}<span><b>Отзыв об этом: ${esc(S.reviews[ri].from)}</b><span>${esc(S.reviews[ri].messages[0])}</span></span>${SYM.chevR}</button>` : ''}
-      ${n.id === 'about' || c ? contactButtons() : ''}`;
+      ${c ? contactButtons() : ''}`;
     const rv = body.querySelector('.n-review');
     if (rv) rv.addEventListener('click', () => openChat(+rv.dataset.i));
     body.scrollTop = 0;
