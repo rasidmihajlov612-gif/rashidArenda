@@ -254,6 +254,7 @@ window.IOS = (() => {
       <div class="view-body">${view.large === false ? '' : `<h1 class="large-title">${esc(view.title || '')}</h1>`}${view.html}</div>`;
     v.dataset.title = view.backTitle || view.title || '';
     if (view.dark || APPS[current.k].dark) v.dataset.dark = '1';
+    if (prev) prev.inert = true;
     stack.appendChild(v);
     syncTone(v);
     v.querySelectorAll('.nav-back:not(.nav-home), [data-pop]').forEach(b => b.addEventListener('click', pop));
@@ -272,7 +273,9 @@ window.IOS = (() => {
   function pop() {
     const stack = current.el.querySelector('.stack');
     const v = stack.lastElementChild, prev = v.previousElementSibling;
-    if (!prev) return;
+    if (!prev || v.inert) return;
+    v.inert = true;
+    prev.inert = false;
     if (v._destroy) { v._destroy(); current.destroys = current.destroys.filter(f => f !== v._destroy); }
     const e = { duration: Core.motionDuration(320), easing: 'cubic-bezier(.3,.7,.3,1)' };
     v.animate([{ transform: 'none' }, { transform: 'translateX(100%)' }], e).onfinish = () => v.remove();

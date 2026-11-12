@@ -127,7 +127,7 @@
 .ios-viewport:not(.is-framed) .app { border-radius: 0; }
 .app.is-dark { background: #000; color: #fff; }
 .stack { position: absolute; inset: 0; }
-.view { position: absolute; inset: 0; display: flex; flex-direction: column; background: inherit; background: #f2f2f7; }
+.view { isolation: isolate; position: absolute; inset: 0; display: flex; flex-direction: column; background: inherit; background: #f2f2f7; }
 .app.is-dark .view { background: #000; }
 .nav {
   flex: none; height: 98px; padding: 54px 8px 0; position: relative; z-index: 2;
